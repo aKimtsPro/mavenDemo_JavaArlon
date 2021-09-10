@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>bstorm.akimts</groupId>
+        <artifactId>basePOM</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!--    region description de base   -->
     <groupId>bstorm.akimts</groupId>
     <artifactId>mavenDemo</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -16,34 +23,47 @@
     <organization>
         <name>bstorm</name>
     </organization>
+    <!--    endregion -->
 
-    <properties>
-        <maven.compiler.target>15</maven.compiler.target>
-        <maven.compiler.source>15</maven.compiler.source>
-        <mysql.version>8.0.26</mysql.version>
-    </properties>
+<!--    herité du parent -->
+        <properties>
+<!--            <maven.compiler.target>15</maven.compiler.target>-->
+<!--            <maven.compiler.source>15</maven.compiler.source>-->
+            <mysql.version>8.0.26</mysql.version>
+<!--            <org.mapstruct.version>1.5.0.Beta1</org.mapstruct.version>-->
+            <profile.chosen>aucun</profile.chosen>
+        </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.5.7.Final</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+<!-- region defini dans le parent-->
+
+    <!--    <dependencies>-->
+    <!--        <dependency>-->
+    <!--            <groupId>mysql</groupId>-->
+    <!--            <artifactId>mysql-connector-java</artifactId>-->
+    <!--            <version>${mysql.version}</version>-->
+    <!--            <scope>runtime</scope>-->
+    <!--            <optional>true</optional>-->
+    <!--        </dependency>-->
+    <!--        <dependency>-->
+    <!--            <groupId>org.hibernate</groupId>-->
+    <!--            <artifactId>hibernate-core</artifactId>-->
+    <!--            <version>5.5.7.Final</version>-->
+    <!--            <scope>compile</scope>-->
+    <!--        </dependency>-->
+    <!--        <dependency>-->
+    <!--            <groupId>org.junit.jupiter</groupId>-->
+    <!--            <artifactId>junit-jupiter-api</artifactId>-->
+    <!--            <version>5.7.2</version>-->
+    <!--            <scope>test</scope>-->
+    <!--        </dependency>-->
+    <!--        <dependency>-->
+    <!--            <groupId>org.mapstruct</groupId>-->
+    <!--            <artifactId>mapstruct</artifactId>-->
+    <!--            <version>${org.mapstruct.version}</version>-->
+    <!--        </dependency>-->
+    <!--    </dependencies>-->
+
+<!--    endregion -->
 
     <build>
         <resources>
@@ -52,6 +72,128 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.1</version>
+                            <configuration>
+                                <annotationProcessorPaths>
+                                    <path>
+                                        <groupId>org.mapstruct</groupId>
+                                        <artifactId>mapstruct-processor</artifactId>
+                                        <version>${org.mapstruct.version}</version>
+                                    </path>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <!--                <version>3.0.0</version>-->
+                <executions>
+                    <execution>
+                        <id>execute-program</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>Main</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>test-sql-plugin</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+
+                        <configuration>
+                            <printResultSet>true</printResultSet>
+                            <sqlCommand>
+                                SELECT * FROM section;
+                                SELECT * FROM student;
+                            </sqlCommand>
+                            <!--                            <sqlCommand>-->
+                            <!--                                INSERT INTO section-->
+                            <!--                                VALUES-->
+                            <!--                                    (2222, "test plugin", 15);-->
+                            <!--                            </sqlCommand>-->
+                        </configuration>
+
+                    </execution>
+                </executions>
+
+            </plugin>
+        </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+<!--                <jdk>15</jdk>-->
+<!--                <property>-->
+<!--                    <name>prop</name>-->
+<!--                    <value>val</value>-->
+<!--                </property>-->
+<!--                <os></os>-->
+<!--                <file>-->
+<!--                    <exists> src/main/resources/file2.txt</exists>-->
+<!--                </file>-->
+            </activation>
+
+            <properties>
+                <profile.choisi>dev</profile.choisi>
+            </properties>
+
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>42.2.23</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>prod</id>
+
+            <activation>
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--                <jdk>11</jdk>-->
+<!--                <property>-->
+<!--                    <name>prop</name>-->
+<!--                    <value>val2</value>-->
+<!--                </property>-->
+<!--                <os></os>-->
+<!--                <file>-->
+<!--                    <missing> src/main/resources/file2.txt</missing>-->
+<!--                </file>-->
+            </activation>
+
+            <properties>
+                <profile.choisi>prod</profile.choisi>
+            </properties>
+
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                    <version>9.4.0.jre16</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>

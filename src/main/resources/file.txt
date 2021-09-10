@@ -1,1 +1,0 @@
-ma version de mysql-connector-java est : ${mysql.version}
